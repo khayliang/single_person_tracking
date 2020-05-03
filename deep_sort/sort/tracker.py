@@ -118,9 +118,6 @@ class Tracker:
             cost_matrix = linear_assignment.gate_cost_matrix(
                 self.kf, cost_matrix, tracks, dets, track_indices,
                 detection_indices)
-
-            print(cost_matrix)
-
             return cost_matrix
 
         # Split track set into confirmed and unconfirmed tracks.
