@@ -26,7 +26,7 @@ class FeatureExtractor(object):
         
         im_batch = torch.cat([self.norm(_resize(im, self.size)).unsqueeze(0) for im in im_crops], dim=0)
         im_batch = im_batch.float()
-        print(im_batch.shape)
+        #print(im_batch.shape)
         return im_batch
 
     

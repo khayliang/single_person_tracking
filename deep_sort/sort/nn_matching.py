@@ -1,6 +1,7 @@
 # vim: expandtab:ts=4:sw=4
 import numpy as np
 from sklearn.preprocessing import normalize
+from scipy.spatial.distance import cosine, euclidean
 
 
 def _pdist(a, b):
@@ -123,6 +124,7 @@ class NearestNeighborDistanceMetric(object):
 
     def __init__(self, metric, matching_threshold, budget=None):
 
+        self.metric = metric
 
         if metric == "euclidean":
             self._metric = _nn_euclidean_distance
@@ -183,21 +185,31 @@ class NearestNeighborDistanceMetric(object):
     def aligned_distance(self, features, targets):
 
         def calculate_mean_dist(feature1, feature2):
+            print("\n\n\nFUCK\n\n\n")
+            print(np.asarray(feature1).shape)
+
             a1 = normalize(feature1)
+
             a2 = normalize(feature2)
 
             dist = np.zeros((8,8))
             for i in range(8):
-            temp_feat1 = a1[i]
+                temp_feat1 = a1[i]
                 for j in range(8):
                     temp_feat2 = a2[j]
-                    dist[i][j] = self._metric(temp_feat1, temp_feat2)  
+                    if self.metric == "euclidean":
+                        dist[i][j] = euclidean(temp_feat1, temp_feat2)  
+                    elif self.metric == "cosine":
+                        dist[i][j] = cosine(temp_feat1, temp_feat2)  
 
             mean_dist = np.mean(np.diag(dist))    
 
             return mean_dist
 
-
         cost_matrix = np.zeros((len(targets), len(features)))
         for i, target in enumerate(targets):
-            cost_matrix[i, :] = self._metric(self.samples[target], features)
+            for j, feature in enumerate(features):
+                #TODO self.samples[target] contains all features of target so need to calculate_mean_dist for every sample geddit
+                cost_matrix[i, j] = calculate_mean_dist(self.samples[target], feature)
+
+        return cost_matrix
