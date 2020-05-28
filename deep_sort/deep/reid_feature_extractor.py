@@ -4,7 +4,7 @@ import numpy as np
 import cv2
 import logging
 
-from osnet_ain import osnet_ain_x1_0
+from .osnet_ain import osnet_ain_x1_0
 
 class ReidExtractor(object):
     def __init__(self, model_path, use_cuda=True):
