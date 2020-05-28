@@ -4,7 +4,7 @@ import numpy as np
 import cv2
 import logging
 
-from .osnet_ain import osnet_ain_x1_0
+from osnet_ain import osnet_ain_x1_0
 
 class ReidExtractor(object):
     def __init__(self, model_path, use_cuda=True):
@@ -35,11 +35,12 @@ class ReidExtractor(object):
 
     def pool2d(self, tensor, type= 'max'):
         sz = tensor.size()
-        print(sz[3]/8)
         if type == 'max':
-            x = torch.nn.functional.max_pool2d(tensor, kernel_size=(sz[2], 1))
+            x = torch.nn.functional.max_pool2d(tensor, kernel_size=(int(sz[2]/8), sz[3]))
         if type == 'mean':
-            x = torch.nn.functional.mean_pool2d(tensor, kernel_size=(sz[2], 1))
+            x = torch.nn.functional.mean_pool2d(tensor, kernel_size=(int(sz[2]/8), sz[3]))
+        x = x[0].cpu().data.numpy()
+        x = np.transpose(x,(2,1,0))[0]
         return x
 
 
@@ -47,8 +48,10 @@ class ReidExtractor(object):
         im_batch = self._preprocess(im_crops)
         with torch.no_grad():
             im_batch = im_batch.to(self.device)
-            features = self.osnet(im_batch, return_featuremaps=True)
-        return features.cpu().numpy()
+            features = self.osnet(im_batch, return_featuremaps=True, fc=False)
+            features = self.pool2d(features)
+            print(features.shape)
+        return features
 
 
 if __name__ == '__main__':
