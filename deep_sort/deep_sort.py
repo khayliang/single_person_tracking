@@ -6,6 +6,7 @@ from .sort.nn_matching import NearestNeighborDistanceMetric
 from .sort.preprocessing import non_max_suppression
 from .sort.detection import Detection
 from .sort.tracker import Tracker
+from .sort.iou_matching import iou_cost_faces
 
 
 __all__ = ['DeepSort']
@@ -111,5 +112,24 @@ class DeepSort(object):
         else:
             features = np.array([])
         return features
+
+    def _match_faces(faces_bbox_xywh, bodies_bbox_xywh):
+        """Returns an array of matches with faces and bodies tuples(bbox_face, bbox_body)
+        """
+        bbox_matches = []
+        iou_vals = iou_cost_faces(faces_bbox_xywh, bodies_bbox_xywh)
+
+        for i, body in enumerate(iou_vals):
+            idx_match = np.where(body==0)
+            if len(idx_match[0]) == 1:
+                bbox_matches.append((faces_bbox_xywh[idx_match[0][0]], bodies_bbox_xywh[i]))
+            else:
+                bbox_matches.append((None, bodies_bbox_xywh[i]))
+
+        return bbox_matches
+
+
+
+
 
 

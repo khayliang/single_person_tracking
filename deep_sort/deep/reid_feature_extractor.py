@@ -4,7 +4,7 @@ import numpy as np
 import cv2
 import logging
 
-from .osnet_ain import osnet_ain_x1_0
+from osnet_ain import osnet_ain_x1_0
 
 class ReidExtractor(object):
     def __init__(self, model_path, use_cuda=True):
@@ -16,8 +16,6 @@ class ReidExtractor(object):
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
         ])
-        
-
 
     def _preprocess(self, im_crops):
         """
@@ -31,8 +29,18 @@ class ReidExtractor(object):
         def _resize(im, size):
             return cv2.resize(im.astype(np.float32)/255., size)
 
-        im_batch = torch.cat([self.norm(_resize(im, self.size)).unsqueeze(0) for im in im_crops], dim=0).float()
+        processed_arr = [self.norm(_resize(im, self.size)).unsqueeze(0) for im in im_crops]
+        im_batch = torch.cat(processed_arr, dim=0).float()
         return im_batch
+
+    def pool2d(self, tensor, type= 'max'):
+        sz = tensor.size()
+        print(sz[3]/8)
+        if type == 'max':
+            x = torch.nn.functional.max_pool2d(tensor, kernel_size=(sz[2], 1))
+        if type == 'mean':
+            x = torch.nn.functional.mean_pool2d(tensor, kernel_size=(sz[2], 1))
+        return x
 
 
     def __call__(self, im_crops):
@@ -46,6 +54,5 @@ class ReidExtractor(object):
 if __name__ == '__main__':
     img = cv2.imread("./pictures/margo1_cropped.jpg")[:,:,(2,1,0)]
     extr = ReidExtractor("checkpoint/ckpt.t7")
-    feature = extr(img)
-    print(feature.shape)
+    feature = extr([img])
 

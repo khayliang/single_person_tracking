@@ -52,8 +52,6 @@ def min_cost_matching(
 
     max_dist = max_distance
 
-    print(max_dist)
-
     if len(detection_indices) == 0 or len(track_indices) == 0:
         return [], track_indices, detection_indices  # Nothing to match.
 

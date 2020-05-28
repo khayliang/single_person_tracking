@@ -4,19 +4,15 @@ import numpy as np
 import cv2
 import logging
 
-from .inception_resnet_v1 import InceptionResnetV1
+from .face_feature_extractor import FaceExtractor
+from .reid_feature_extractor import ReidExtractor
 
-class FaceExtractor(object):
+class FeatureExtractor(object):
     def __init__(self, use_cuda=True):
-        self.net = InceptionResnetV1(pretrained="vggface2").eval()
-        self.device = "cuda" if torch.cuda.is_available() and use_cuda else "cpu"
-        self.net.to(self.device)
-        self.size = (160, 160)
-        self.norm = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
-        ])
-    def _preprocess(self, im_crops):
+        self.face_extractor = FaceExtractor()
+        self.reid_extractor = ReidExtractor()
+
+    def _preprocess(self, im_crops_tuple):
         """
         TODO:
             1. to float with scale from 0 to 1
@@ -30,15 +26,20 @@ class FaceExtractor(object):
         
         im_batch = torch.cat([self.norm(_resize(im, self.size)).unsqueeze(0) for im in im_crops], dim=0)
         im_batch = im_batch.float()
+        print(im_batch.shape)
         return im_batch
 
+    
+    def __call__(self, im_crops_tuple):
+        unzip_tuples = [list(t) for t in zip(*tuples_list)]
+        im_crops_face = np.array(unzip_tuples[1])
+        im_crops_body = np.array(unzip_tuples[1])
+        
+        features_body = ReidExtractor(im_crops_body)
+        features_face = FaceExtractor(im_crops_face)
 
-    def __call__(self, im_crops):
-        im_batch = self._preprocess(im_crops)
-        with torch.no_grad():
-            im_batch = im_batch.to(self.device)
-            #features = self.net(im_batch)
-            features = self.net(im_batch)
+        zipped_features = zip()
+
         return features.cpu().numpy()
 
 
@@ -53,3 +54,4 @@ if __name__ == '__main__':
     a = np.asarray(feature) / np.linalg.norm(feature, axis=1, keepdims=True)
     b = np.asarray(feature) / np.linalg.norm(feature, axis=1, keepdims=True)
     cos_dist= 1. - np.dot(a, b.T)
+    print(cos_dist)

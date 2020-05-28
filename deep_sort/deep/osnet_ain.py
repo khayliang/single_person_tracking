@@ -408,6 +408,7 @@ class OSNet(nn.Module):
                 nn.init.normal_(m.weight, 0, 0.01)
                 if m.bias is not None:
                     nn.init.constant_(m.bias, 0)
+    
 
     def featuremaps(self, x):
         x = self.conv1(x)
@@ -420,8 +421,10 @@ class OSNet(nn.Module):
         x = self.conv5(x)
         return x
 
-    def forward(self, x, return_featuremaps=False):
+    def forward(self, x, return_featuremaps=False, fc=True):
         x = self.featuremaps(x)
+        if not fc:
+            return x
         v = self.global_avgpool(x)
         v = v.view(v.size(0), -1)
         if self.fc is not None:
@@ -483,10 +486,7 @@ def init_pretrained_weights(model, key=''):
     state_dict = torch.load("./deep_sort/deep/checkpoint/model.pth.tar-100")
     #print(state_dict)
     state_dict = state_dict["state_dict"]
-    for item in state_dict.items():
-        print(item[0])
     model_dict = model.state_dict()
-    print(len(model_dict))
 
     new_state_dict = OrderedDict()
     matched_layers, discarded_layers = [], []
@@ -496,7 +496,6 @@ def init_pretrained_weights(model, key=''):
             k = k[7:] # discard module.
 
         if k in model_dict and model_dict[k].size() == v.size():
-            print("adding")
             new_state_dict[k] = v
             matched_layers.append(k)
         else:
