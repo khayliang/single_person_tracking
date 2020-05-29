@@ -61,9 +61,6 @@ def min_cost_matching(
 
     row_indices, col_indices = linear_assignment(cost_matrix)
 
-    print(cost_matrix)
-
-
     matches, unmatched_tracks, unmatched_detections = [], [], []
     for col, detection_idx in enumerate(detection_indices):
         if col not in col_indices:
