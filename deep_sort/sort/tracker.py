@@ -37,7 +37,7 @@ class Tracker:
 
     """
 
-    def __init__(self, metric, max_iou_distance=0.7, max_age=50, n_init=3):
+    def __init__(self, metric, max_iou_distance=0.7, max_age=50, n_init=3, aligned=False):
         self.metric = metric
         self.max_iou_distance = max_iou_distance
         self.max_age = max_age
@@ -48,6 +48,8 @@ class Tracker:
         self._next_id = 1
 
         self.tracking_id = None
+
+        self.aligned = aligned
 
     def predict(self):
         """Propagate track state distributions one time step forward.
@@ -114,7 +116,11 @@ class Tracker:
         def gated_metric(tracks, dets, track_indices, detection_indices):
             features = np.array([dets[i].feature for i in detection_indices])
             targets = np.array([tracks[i].track_id for i in track_indices])
-            cost_matrix = self.metric.distance(features, targets)
+            if self.aligned:
+                cost_matrix = self.metric.aligned_distance(features, targets)
+            else:
+                cost_matrix = self.metric.distance(features, targets)
+
             #print(len(cost_matrix))
             cost_matrix = linear_assignment.gate_cost_matrix(
                 self.kf, cost_matrix, tracks, dets, track_indices,

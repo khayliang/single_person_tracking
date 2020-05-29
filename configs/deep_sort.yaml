@@ -7,4 +7,5 @@ DEEPSORT:
   MAX_AGE: 1
   N_INIT: 3
   NN_BUDGET: 100
+  ALIGNED: True
   
