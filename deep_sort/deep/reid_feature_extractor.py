@@ -51,10 +51,8 @@ class ReidExtractor(object):
         im_batch = self._preprocess(im_crops)
         with torch.no_grad():
             im_batch = im_batch.to(self.device)
-
-            features = self.osnet(im_batch, return_featuremaps=True, fc=False)
-            features = [self.pool2d(feature) for feature in features]
-
+            features = self.osnet(im_batch, return_featuremaps=True, fc=True)
+            #features = [self.pool2d(feature) for feature in features]
         return features
 
 

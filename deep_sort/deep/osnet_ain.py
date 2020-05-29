@@ -409,11 +409,7 @@ class OSNet(nn.Module):
                 nn.init.normal_(m.weight, 0, 0.01)
                 if m.bias is not None:
                     nn.init.constant_(m.bias, 0)
-
-
-
-    
-
+                    
     def featuremaps(self, x):
         x = self.conv1(x)
         x = self.maxpool(x)
