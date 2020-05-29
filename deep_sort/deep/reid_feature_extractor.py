@@ -33,27 +33,13 @@ class ReidExtractor(object):
         im_batch = torch.cat(processed_arr, dim=0).float()
         return im_batch
 
-    def pool2d(self, tensor, type= 'max'):
-        sz = tensor.size()
-
-        if type == 'max':
-            x = torch.nn.functional.max_pool2d(tensor, kernel_size=(int(sz[1]/8), sz[2]))
-        if type == 'mean':
-            x = torch.nn.functional.mean_pool2d(tensor, kernel_size=(int(sz[1]/8), sz[2]))
-
-        x = x.cpu().data.numpy()
-        x = np.transpose(x,(2,1,0))[0]
-
-        return x
-
-
     def __call__(self, im_crops):
         im_batch = self._preprocess(im_crops)
         with torch.no_grad():
             im_batch = im_batch.to(self.device)
             features = self.osnet(im_batch, return_featuremaps=True, fc=True)
             #features = [self.pool2d(feature) for feature in features]
-        return features
+        return features.cpu().numpy()
 
 
 if __name__ == '__main__':

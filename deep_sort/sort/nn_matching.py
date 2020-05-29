@@ -187,7 +187,6 @@ class NearestNeighborDistanceMetric(object):
         def calculate_mean_dist(feature1, feature2):
 
             a1 = normalize(feature1)
-
             a2 = normalize(feature2)
 
             dist = np.zeros((8,8))
@@ -204,8 +203,6 @@ class NearestNeighborDistanceMetric(object):
 
             return mean_dist
         
-
-
         cost_matrix = np.zeros((len(targets), len(features)))
         for i, target in enumerate(targets):
             for j, feature in enumerate(features):
@@ -216,8 +213,6 @@ class NearestNeighborDistanceMetric(object):
                     dist = calculate_mean_dist(sample, feature)
                     min_dist = min(min_dist, dist)
 
-
                 cost_matrix[i, j] = min_dist
     
-        print(cost_matrix)
         return cost_matrix

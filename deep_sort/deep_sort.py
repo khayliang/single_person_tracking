@@ -2,6 +2,7 @@ import numpy as np
 import torch
 
 from .deep.reid_feature_extractor import ReidExtractor
+from .deep.aligned_feature_extractor import AlignedExtractor
 from .sort.nn_matching import NearestNeighborDistanceMetric
 from .sort.preprocessing import non_max_suppression
 from .sort.detection import Detection
