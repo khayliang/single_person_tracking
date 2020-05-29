@@ -5,3 +5,4 @@
 *.pth.tar-100
 /.vscode
 
+output/results.txt

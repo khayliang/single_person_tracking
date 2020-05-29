@@ -185,8 +185,6 @@ class NearestNeighborDistanceMetric(object):
     def aligned_distance(self, features, targets):
 
         def calculate_mean_dist(feature1, feature2):
-            print("\n\n\nFUCK\n\n\n")
-            print(np.asarray(feature1).shape)
 
             a1 = normalize(feature1)
 
@@ -205,11 +203,21 @@ class NearestNeighborDistanceMetric(object):
             mean_dist = np.mean(np.diag(dist))    
 
             return mean_dist
+        
+
 
         cost_matrix = np.zeros((len(targets), len(features)))
         for i, target in enumerate(targets):
             for j, feature in enumerate(features):
                 #TODO self.samples[target] contains all features of target so need to calculate_mean_dist for every sample geddit
-                cost_matrix[i, j] = calculate_mean_dist(self.samples[target], feature)
 
+                min_dist = 1000
+                for sample in self.samples[target]:
+                    dist = calculate_mean_dist(sample, feature)
+                    min_dist = min(min_dist, dist)
+
+
+                cost_matrix[i, j] = min_dist
+    
+        print(cost_matrix)
         return cost_matrix
