@@ -1,0 +1,7 @@
+*.mp4
+*.avi
+*.pyc
+*.weights
+*.pth.tar-100
+/.vscode
+
