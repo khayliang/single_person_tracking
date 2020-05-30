@@ -37,6 +37,8 @@ However in original code, the CNN model is implemented with tensorflow, which I'
 - pillow
 - vizer
 - edict
+- pyyaml
+- easydict
 
 ## Quick Start
 0. Check all dependencies installed
